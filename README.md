@@ -1,190 +1,168 @@
-Java Voting System – Review 1 Submission
-By:
+# 🗳️ Java Voting System – Review 1 Submission  
+### **By:**  
+- **Mohd Arsh (24scse1180015)**  
+- **Shivam Gupta (24scse1180615)**  
 
-Mohd Arsh (24scse1180015)
-Shivam Gupta (24scse1180615)
+---
 
-🚀 Project Overview
+## 📌 **Project Overview**
+This is a **Java-based Voting System** built as part of **Review-1** for the Java GUI/Web-based project evaluation.  
+The project demonstrates strong understanding and implementation of:
 
-This is a Java-based Voting System implemented using
-✔ Core Java
-✔ OOP Principles
-✔ DAO Layer Architecture
-✔ JDBC
-✔ MySQL Database
-✔ Multithreading + Synchronization
+- Core Java  
+- OOP Concepts  
+- JDBC & MySQL  
+- DAO Architecture  
+- Collections & Generics  
+- Multithreading & Synchronization  
 
-This project fulfills all Review-1 requirements under Java GUI/Web-based project criteria.
+This version is a **Console-Based Prototype**, fully aligned with Review-1 requirements.
 
-🏗 Project Architecture
+---
+
+## 📂 **Project Structure (src folder)**
+
 src/
- └─ com.votingsystem.model        → User, Candidate, Vote
- └─ com.votingsystem.dao          → DAO Interfaces (UserDAO, CandidateDAO, VoteDAO)
- └─ com.votingsystem.dao.impl     → JDBC DAO Implementations
- └─ com.votingsystem.util         → DBConnection (MySQL Connector)
- └─ com.votingsystem.service      → VotingService (business logic + synchronized voting)
- └─ com.votingsystem.ui           → DBTest, App, ThreadDemo (console UI/testing)
+└─ com.votingsystem.model
+├─ User.java
+├─ Candidate.java
+├─ Vote.java
+└─ Admin.java (Inheritance)
+└─ com.votingsystem.dao
+├─ UserDAO.java
+├─ CandidateDAO.java
+├─ VoteDAO.java
+├─ DAOException.java
+└─ com.votingsystem.dao.impl
+├─ UserDAOImpl.java
+├─ CandidateDAOImpl.java
+├─ VoteDAOImpl.java
+└─ com.votingsystem.service
+├─ Notifier.java (Interface)
+├─ ConsoleNotifier.java
+├─ EmailNotifier.java
+└─ VotingService.java (synchronized method)
+└─ com.votingsystem.ui
+├─ App.java (Main runner)
+├─ DBTest.java (Test DB connection)
+└─ ThreadDemo.java (Multithreading test)
+└─ com.votingsystem.util
+└─ DBConnection.java
 
-🗄 Database Schema (MySQL)
-Tables:
+sql
+Copy code
 
-users
+---
 
-candidates
+## 🛢️ **Database Schema**
 
-votes
+### **Database:** `voting_db`
 
-Schema Script:
-CREATE DATABASE voting_db;
-USE voting_db;
+#### **Users Table**
+| Column | Type | Description |
+|-------|------|-------------|
+| user_id | INT (PK, AI) | Unique user |
+| username | VARCHAR(50) | Unique |
+| password_hash | VARCHAR(255) | Password |
+| role | ENUM('ADMIN', 'VOTER') | Role |
 
-CREATE TABLE users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    role ENUM('ADMIN', 'VOTER') NOT NULL
-);
+#### **Candidates Table**
+| Column | Type |
+|--------|------|
+| candidate_id | INT (PK, AI) |
+| name | VARCHAR(100) |
+| party | VARCHAR(100) |
+| description | VARCHAR(255) |
 
-CREATE TABLE candidates (
-    candidate_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    party VARCHAR(100),
-    description VARCHAR(255)
-);
+#### **Votes Table**
+| Column | Type | Notes |
+|--------|------|--------|
+| vote_id | INT (PK, AI) |
+| voter_id | INT | FK → users(user_id), **UNIQUE** |
+| candidate_id | INT | FK → candidates(candidate_id) |
+| vote_time | TIMESTAMP | Auto timestamp |
 
-CREATE TABLE votes (
-    vote_id INT PRIMARY KEY AUTO_INCREMENT,
-    voter_id INT NOT NULL,
-    candidate_id INT NOT NULL,
-    vote_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (voter_id),
-    FOREIGN KEY (voter_id) REFERENCES users(user_id),
-    FOREIGN KEY (candidate_id) REFERENCES candidates(candidate_id)
-);
+---
 
-INSERT INTO users (username, password_hash, role)
-VALUES ('admin', 'admin', 'ADMIN'),
-       ('arsh', '1234', 'VOTER');
+## 🔗 **JDBC Connection**
+Used **MySQL Connector/J (mysql-connector-j-9.x.x)**.  
+DBConnection class provides centralized connection handling:
 
-INSERT INTO candidates (name, party, description)
-VALUES ('Candidate A', 'Party X', 'For development'),
-       ('Candidate B', 'Party Y', 'For education');
+```java
+Connection conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+⚙️ DAO Architecture
+Fully implemented DAO Pattern:
 
-✔ Review-1 Rubric Mapping (All Requirements Covered)
-1️⃣ OOP Implementation – ✓
+UserDAO, CandidateDAO, VoteDAO
 
-Inheritance → Admin extends User
+Implemented by UserDAOImpl, CandidateDAOImpl, VoteDAOImpl
 
-Polymorphism → Notifier, ConsoleNotifier, EmailNotifier
+All database operations are modular and reusable
 
-Interfaces → DAO interfaces + Notifier
+🧠 OOP Concepts Implemented
+✔ Inheritance
+Admin extends User.
 
-Encapsulation → All model classes
+✔ Polymorphism
+Notifier → implemented by ConsoleNotifier and EmailNotifier.
 
-Abstraction → DAO structure
+✔ Encapsulation
+Private fields with getters/setters in all model classes.
 
-Exception Handling → DAOException
+✔ Interfaces
+DAO interfaces + Notifier interface.
 
-2️⃣ Collections & Generics – ✓
+✔ Exception Handling
+Custom DAOException for wrapping SQLExceptions.
 
+📚 Collections & Generics
+Used:
+
+java
+Copy code
 List<Candidate>
+Map<Candidate, Integer>
+Map used for result counting → demonstrates Generics & advanced collection usage.
 
-List<User>
+🧵 Multithreading & Synchronization
+The VotingService contains:
 
-Map<Candidate, Integer> for vote counting
+java
+Copy code
+public synchronized boolean castVote(...)
+This ensures thread-safe voting, preventing double votes when multiple threads run.
 
-3️⃣ Multithreading & Synchronization – ✓
+ThreadDemo.java demonstrates concurrency:
 
-ThreadDemo.java
+Thread-1 → vote inserted
 
-Multiple threads trying to vote simultaneously
+Thread-2 → blocked (voter already voted)
 
-synchronized castVote() in VotingService
+📸 Screenshots Included in PPT
+DB connection test
 
-Ensures no race conditions
+Candidate list output
 
-Output (Proof):
+SHOW TABLES
 
-[NOTIFY] Vote recorded for voter 2 -> candidate 1
-Thread-1 -> true
-[NOTIFY] Voter 2 already voted.
-Thread-2 -> false
-Thread test finished.
+Results map
 
-4️⃣ JDBC Connectivity – ✓
+Multithreading (ThreadDemo) output
 
-DBConnection class
+🔗 GitHub Repository
+👉 https://github.com/mohdarsh-3/java-voting-system
 
-MySQL Connector JAR
-
-PreparedStatements
-
-Secure parameterized queries
-
-5️⃣ DAO Classes for Database Operations – ✓
-
-CandidateDAO + Impl
-
-UserDAO + Impl
-
-VoteDAO + Impl
-
-All CRUD operations implemented using JDBC.
-
-🧪 Console Output (Screenshots in PPT)
-✔ DB Connection Test
-
-Shows:
-
-Connection Successful: true
-
-✔ Candidate List
-
-Displays all candidates from DB
-
-✔ SHOW TABLES
-
-Proof of schema creation
-
-✔ Multithreading Output
-
-Demonstrates synchronization working perfectly
-
-📌 GitHub Repository
-
-https://github.com/mohdarsh-3/java-voting-system
-
-🛠 How to Run
-Prerequisites
-
-JDK 17+
-
-Eclipse/VSCode/IntelliJ
-
-MySQL 8+
-
-MySQL Connector JAR
-
-Steps
-
-Import project in Eclipse
-
-Add MySQL Connector JAR inside /lib
-
-Update DB credentials in DBConnection.java
-
-Run MySQL script
-
-Run:
-
+📝 How to Run
+1. Import project into Eclipse
+2. Ensure MySQL server is running
+3. Create database:
+sql
+Copy code
+SOURCE voting_db.sql;
+4. Run:
 DBTest.java
 
 App.java
 
 ThreadDemo.java
 
-📞 Contact
-
-For any queries:
-Mohd Arsh – 24scse1180015
-Shivam Gupta – 24scse1180615
